@@ -1,0 +1,64 @@
+<html>
+<head>
+  <!-- YOU NEED THIS TO RUN $Jquery!! -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- YOU NEED THIS TO RUN SOCKET.IO!! -->
+    <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    <!-- STARTS script tag... -->
+    <script type ="text/javascript">
+        $(document).ready(function (){
+            // this triggers the connection to socket as soon as document is ready
+            var socket = io.connect();
+            
+            // when the form is submitted .. 
+            $('#form').submit(function (e){
+              // prevents the default action (in this case prevents submit form from actually submitting -- need or else it will get your to a post action!!!)
+              // e represents the event being passed (in this case, the post?? ??)
+                e.preventDefault();
+
+                // 1. emit to socket - run 'posting_form' function and pass data name, location, language, comment
+                socket.emit("posting_form", {
+                  name: $('#name').val(),
+                  location: $('#location').val(),
+                  language: $('#language').val(),
+                  comment: $('#comment').val()     
+                });
+
+            });
+
+            // 4.0 from server, when it triggers 'updated_message' here, it will pass that 'data' as a response
+            socket.on('updated_message', function (data){
+              // #message is the empty div tag in html
+              $('#message').html("You emitted the following info to server: " + JSON.stringify(data.response));
+            });
+
+            // 4.5 from server when it triggers 'random_number' and passes that 'data' (random number created) as a response
+            socket.on('random_number', function(data){
+              $('#number').html("Your lucky number emitted by server is:" + JSON.stringify(data.response));
+            });
+        });
+
+    </script>
+</head>
+<body>
+  <div id="message"></div>
+  <div id="number"></div>
+    
+<form id = "form" action=" ">
+  Name: <input type='text' id = 'name' name='name'>
+  Dojo Location: <input type='text' id = 'location' name='location'>
+  Favorite Language:<select name="language" id= "language">
+  <option value="Ruby">Ruby</option>
+  <option value="Python">Python</option>
+  <option value="PHP">PHP</option>
+</select>
+  Comment (optional):<input type='text' name='comment' id="comment">
+  <input type='submit' value='Submit'>
+ </form>
+
+
+
+
+</body>
+</html>
+
